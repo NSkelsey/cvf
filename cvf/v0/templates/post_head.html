@@ -1,0 +1,14 @@
+<div class="post_head row" >
+  <div class="span1 point_box">
+    <div class=votes>v:{{ post.votes|length }}</div>
+    <div class=rel_votes>rel:{{ post.rel_votes|length }}</div>
+  </div>
+  <div class="span11 title">
+    <blockquote id=bq class=title >
+      <p><a class=lead href="/posts/{{ post.id }}">{{ post.title }}</a></p>
+      <small>Posted by {{ post.user }} on {{ post.date|date:"m/d/Y" }} with {{ post.children.all|length }} direct children</small>
+    </blockquote>
+  </div>
+</div>
+
+

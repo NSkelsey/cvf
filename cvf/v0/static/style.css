@@ -1,0 +1,59 @@
+html, body {
+  height: 100%;
+}
+
+div.post_head {
+  border-top: solid 3px #EEE;
+  width : 950px;
+  margin-bottom: 0px;
+}
+
+p {
+  word-wrap: break-word;
+}
+
+div.container {
+  width: 950px;
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  overflow:auto;
+  padding-bottom:120px; /* this needs to be bigger than footer height*/
+
+}
+
+blockquote {
+  margin-bottom: 20px;
+}
+
+div > h5 {
+  margin-top: 20px;
+  margin-bottom: 0px;
+}
+div.row {
+  margin-left: 0px;
+}
+
+.footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  background-color: whiteSmoke;
+  margin-top: -120px; /* negative value of footer height */
+  height: 120px;
+  clear:both;
+  padding-top:20px;
+}
+
+div.navbar {
+  margin-bottom: 20px;
+}
+
+div.title {
+  margin-left: 0px;
+}
+div.votes {
+  color: orange;
+}
+div.rel_votes{
+  color: green;
+}

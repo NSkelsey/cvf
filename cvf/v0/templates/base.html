@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Forum</title>
+    <link href="{{ STATIC_URL }}assets/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ STATIC_URL }}style.css" />
+  </head>
+  <body>
+    <div class=container>
+      <div class=row>
+        <div class=span6>
+          <h3 class=title>Charlottesville Public Forum</h3>
+        </div>
+        <div class="span3 pull-right create_account">
+          <h5 class="pull-right"><a href=# >Create Account</a></h5>
+        </div>
+      </div>
+      <div class="navbar">
+        <div class=navbar-inner>
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="#">Principles</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="#">Most Discussed</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="#">Most Relevant</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="#">Information</a></li>
+            <li class="divider-vertical"></li>
+          </ul>
+          <ul class="nav pull-right">
+            <li class="divider-vertical"></li>
+            <li class="dropdown">
+            <a class="dropdown-toggle"
+              data-toggle="dropdown"
+              href="#">Sort<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li ><a href="#">Popular</a></li>
+              <li ><a href="#">Relevant</a></li>
+              <li ><a href="#">Comments</a></li>
+              <li ><a href="#">Newest</a></li>
+            </ul>
+            </li>
+            <li class="divider-vertical"></li>
+            {% if user.is_authenticated %}
+            <li class="dropdown">
+            <a class="dropdown-toggle" 
+              data-toggle="dropdown" 
+              href="/users/{{ user }}">{{ user }}<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/user/{{ user }}">Profile</a></li>
+            </li>
+            {% else %}
+            <li ><a href="/login">Login</a></li>
+            {% endif %}
+          </ul>
+        </div>
+        {% block content %}
+        {% endblock %}
+
+      </div>
+    </div>
+      <footer class="footer"> 
+      <div class=row>
+        <div class=span12>
+          <p> Meta information and legal stuff? perhaps?</p>
+        </div>
+      </div>
+      </footer>
+
+
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="/static/assets/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
