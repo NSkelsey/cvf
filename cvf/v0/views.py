@@ -26,7 +26,7 @@ def make_post(request):
             post.save()
             return HttpResponseRedirect("/")
     return render_to_response("post_form.html",
-            {"pform" : pform, 'dont_add_ret_url': True},
+            {"pform" : pform, "dont_add_ret_url": True},
             RequestContext(request))
 
 def login(request):
@@ -48,25 +48,35 @@ def login(request):
 
 def post_view(request, id_num, pform=None):
     post = get_object_or_404(Post, pk=id_num)
-    children = Post.objects.filter(parent=post)\
+    children = list(Post.objects.filter(parent=post)\
             .annotate(num_votes=Count('vote'))\
-            .order_by('-num_votes')
+            .order_by('-num_votes'))
     pform = PostForm()
+    """if len(children) > 3:
+        children = [{'post': p, 'childs': p.children.all()} for p in children]
+    else:
+        children = [{'post': p, 'childs': p.children.all()[0:2]} for p in children]
+    """
+
     return render_to_response('post.html',
-            {'post' : post, 'children':children, 'pform': pform},
+            {'post' : post, 'p_struct':children, 'pform': pform},
             RequestContext(request))
 
 def sub_post(request, id_num): #for nested posts
     pform = PostForm(request.POST or None)
     parent = get_object_or_404(Post, pk=id_num)
     if (request.method == 'POST'
-            and pform.is_valid()
-            and request.user.is_authenticated()):
-        post = Post(title=pform.cleaned_data["title"],
-                    body=pform.cleaned_data["body"],
-                    parent=parent,
-                    user=request.user)
-        post.save()
+        and request.user.is_authenticated()):
+        if pform.is_valid():
+            post = Post(title=pform.cleaned_data["title"],
+                        body=pform.cleaned_data["body"],
+                        parent=parent,
+                        user=request.user)
+            post.save()
+        else:
+            return render_to_response("post_form.html",
+                    {'pform' : pform, 'post':parent},
+                    RequestContext(request))
     return HttpResponseRedirect("/posts/"+id_num)
 
 

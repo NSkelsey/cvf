@@ -9,7 +9,7 @@ class PostForm(ModelForm):
         model = models.Post
         fields = ('title', 'body')
         widgets = {
-                "body" : Textarea(attrs={'cols':80,'rows':20}),
+                "body" : Textarea(attrs={'cols':200,'rows':10}),
                 }
 
 class UserForm(forms.Form):

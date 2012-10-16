@@ -1,29 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="row">
+<div class="row base">
   <div class="span8">
-  {% if post.parent.id %}
+    {% if post.parent.id %}
     <a href="/posts/{{ post.parent.id }}">^ Parent ^</a>
-  {% else %}
+    {% else %}
     <a href="/">^ back home ^</a>
-  {% endif %}
+    {% endif %}
   </div>
 </div>
+<div class=toppost>
 {% include 'post_head.html' %}
-<div class=well>
-    <p>
-    {{ post.body }}
-    </p>
-  </div>
-  {% for post in children %}
-  {% include 'post_head.html' %}
-  {% empty %}
-  <p> No children of this post </p>
-  {% endfor %}
+</div>
+<div class="well base">
+  <p>
+  {{ post.body }}
+  </p>
+</div>
 
-  
-  {% include 'post_form.html' %}
+{% for post in p_struct %}
+  {% include 'post_tree.html' %}
+{% empty %}
+  <p> No children of this post </p>
+{% endfor %}
+
+
+{% include 'post_form.html' %}
 
 
 {% endblock content %}

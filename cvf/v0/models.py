@@ -18,6 +18,9 @@ class Post(models.Model):
     edited = models.BooleanField(blank=True)
     parent = models.ForeignKey('self', blank=True, null=True, related_name="children")
 
+    def __repr__(self):
+        return u"<PostO title: %s>" % (self.title)
+
 class Revision(models.Model):
     post = models.ForeignKey(Post)
     date_stored = models.DateTimeField(auto_now=True)

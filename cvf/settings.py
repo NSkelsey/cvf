@@ -168,3 +168,6 @@ INTERNAL_IPS = ('10.0.2.2', '127.0.0.1', )
 #    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
 #}
 
+
+DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS' : False}
+

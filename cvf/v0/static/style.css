@@ -4,8 +4,9 @@ html, body {
 
 div.post_head {
   border-top: solid 3px #EEE;
-  width : 950px;
+  width: 950px;
   margin-bottom: 0px;
+  height: 80px;
 }
 
 p {
@@ -13,17 +14,25 @@ p {
 }
 
 div.container {
-  width: 950px;
   min-height: 100%;
   height: auto !important;
   height: 100%;
   overflow:auto;
   padding-bottom:120px; /* this needs to be bigger than footer height*/
-
+  margin-left: 10px;
+  margin-right: 0px;
+  width: 1250px;
 }
 
 blockquote {
-  margin-bottom: 20px;
+  height: 80px;
+  margin-bottom: 0px;
+}
+
+div.base {
+  padding-right: 5px;
+  padding-left: 5px;
+  width: 950px;
 }
 
 div > h5 {
@@ -57,3 +66,13 @@ div.votes {
 div.rel_votes{
   color: green;
 }
+
+div.children{
+  padding-left: 80px;
+}
+
+input, textarea
+{
+width: 950px;
+}
+

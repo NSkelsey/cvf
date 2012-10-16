@@ -1,0 +1,10 @@
+{% include 'post_head.html' %}
+<div class="children">
+  {% for p in post.children.all %}
+     {% with post=p temp="post_tree.html" %}
+      {% include temp %}
+    {% endwith %}
+  {% endfor %}
+</div>
+
+
