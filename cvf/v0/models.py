@@ -17,6 +17,7 @@ class Post(models.Model):
     comment = models.BooleanField(blank=True)
     edited = models.BooleanField(blank=True)
     parent = models.ForeignKey('self', blank=True, null=True, related_name="children")
+    identifier = models.IntegerField(default=0)
 
     def __repr__(self):
         return u"<PostO title: %s>" % (self.title)
@@ -29,7 +30,7 @@ class Revision(models.Model):
 class Vote(models.Model):
     user = models.ForeignKey(User)
     post = models.ForeignKey(Post)
-    parent_post = models.ForeignKey(Post, related_name="child_vote")
+    parent_post = models.ForeignKey(Post, related_name="child_vote", null=True)
 
 class RelVote(models.Model):
     user = models.ForeignKey(User)

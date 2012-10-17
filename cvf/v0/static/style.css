@@ -6,14 +6,13 @@ div.post_head {
   border-top: solid 3px #EEE;
   width: 950px;
   margin-bottom: 0px;
-  height: 80px;
 }
 
 p {
   word-wrap: break-word;
 }
 
-div.container {
+div.container.outer {
   min-height: 100%;
   height: auto !important;
   height: 100%;
@@ -24,8 +23,12 @@ div.container {
   width: 1250px;
 }
 
+div.container.header {
+  min-height: 100%;
+  width: 950px;
+  margin: 0px;
+}
 blockquote {
-  height: 80px;
   margin-bottom: 0px;
 }
 
@@ -60,7 +63,7 @@ div.navbar {
 div.title {
   margin-left: 0px;
 }
-div.votes {
+.votes {
   color: orange;
 }
 div.rel_votes{
@@ -71,8 +74,12 @@ div.children{
   padding-left: 80px;
 }
 
-input, textarea
+.post_form > Textarea, #id_title
 {
 width: 950px;
 }
 
+h5.identifier {
+  float: right;
+  color: red;
+}

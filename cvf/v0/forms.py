@@ -25,3 +25,9 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
 
 
+class VoteForm(forms.Form):
+    pass
+
+class RelVoteForm(forms.Form):
+    pass
+

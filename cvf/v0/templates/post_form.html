@@ -1,7 +1,7 @@
 {% if dont_add_ret_url %}
 <form method=post action="/make_post" >
 {% else %}
-<form method=post action="/posts/{{ post.id }}/sub_post">
+<form class="post_form" method=post action="/posts/{{ post.id }}/sub_post">
 {% endif %}
   {% csrf_token %}
   {{ pform }}

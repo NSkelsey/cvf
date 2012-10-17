@@ -2,14 +2,19 @@ import django
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.forms.util import ErrorList
 from django.db.models import Count
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+
+from IPython import embed
 
 import models
-from forms import PostForm, UserForm, LoginForm
-from models import Post
-from IPython import embed
+from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm
+from models import Post, Vote
+from alchemy_hooks import DBSession
+from alchemy_models import v0_relvote
 
 def home(request):
     posts = models.Post.objects.all()
@@ -17,7 +22,7 @@ def home(request):
             {"posts": posts},
             RequestContext(request))
 
-def make_post(request):
+def make_post(request): #for commiting posts to the forum proper
     pform = PostForm(request.POST or None)
     if request.method == "POST":
         if pform.is_valid():
@@ -45,6 +50,10 @@ def login(request):
             {"form":log_form},
             RequestContext(request))
 
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect("/")
+
 
 def post_view(request, id_num, pform=None):
     post = get_object_or_404(Post, pk=id_num)
@@ -68,10 +77,16 @@ def sub_post(request, id_num): #for nested posts
     if (request.method == 'POST'
         and request.user.is_authenticated()):
         if pform.is_valid():
-            post = Post(title=pform.cleaned_data["title"],
+            title = pform.cleaned_data["title"]
+            check = Post.objects.filter(title=title).order_by("-identifier")
+            check_int = 0
+            if len(check) > 0:
+                check_int = check[0].identifier + 1
+            post = Post(title=title,
                         body=pform.cleaned_data["body"],
                         parent=parent,
-                        user=request.user)
+                        user=request.user,
+                        identifier=check_int)
             post.save()
         else:
             return render_to_response("post_form.html",
@@ -79,9 +94,30 @@ def sub_post(request, id_num): #for nested posts
                     RequestContext(request))
     return HttpResponseRedirect("/posts/"+id_num)
 
+@require_http_methods(["POST",])
+def vote(request, id_num):
+    vf = VoteForm(request.POST or None)
+    post = get_object_or_404(Post, pk=id_num)
+    if vf.is_valid() and request.user.is_authenticated():
+        user = request.user
+        prev_vote = Vote.objects.filter(user=user, parent_post=post.parent,)
+        if prev_vote.exists():
+            prev_vote.delete()
+            messages.warning(request, 'Changing your vote because you already voted on some child of the parent post')
+        vote  = Vote(post=post, parent_post=post.parent, user=user)
+        vote.save()
+        return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 
-
-
-
+@login_required
+@require_http_methods(["POST",])
+def rel_vote(request, id_num):
+    rvf = RelVoteForm(request.POST)
+    post = get_object_or_404(Post, pk=id_num)
+    user = request.user
+    if rvf.is_valid():
+        session = DBSession()
+        li = session.query(v0_relvote).all()
+        return HttpResponse(str(li))
+        #return HttpResponseRedirect(request.META["HTTP_REFERER"])
 

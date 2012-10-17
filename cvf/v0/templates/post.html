@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="row base">
+<div class="row">
   <div class="span8">
     {% if post.parent.id %}
     <a href="/posts/{{ post.parent.id }}">^ Parent ^</a>
@@ -13,10 +13,14 @@
 <div class=toppost>
 {% include 'post_head.html' %}
 </div>
-<div class="well base">
+<div class=row>
+  <div class=span12>
+<div class="well">
   <p>
   {{ post.body }}
   </p>
+</div>
+</div>
 </div>
 
 {% for post in p_struct %}
