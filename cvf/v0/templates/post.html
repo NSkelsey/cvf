@@ -1,6 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
+<div class=row>
+  <div class="span6 offset3">
+    <h4> {{ prof_user.username }}'s Profile </h4> {{ now|date:"h:i:s"  }}
+  </div>
+</div>
+
+{% for vote in rel_o.votes %}
+<div class=row>
+  <div class=span6>
+    {{ vote.date_expire|date:"h:i:s"  }} Post: {{ vote.post.title }}
+  </div>
+</div>
+{% endfor %}
+
+
 <div class="row">
   <div class="span8">
     {% if post.parent.id %}

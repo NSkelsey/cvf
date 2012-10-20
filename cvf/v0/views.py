@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import django
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -7,14 +9,18 @@ from django.forms.util import ErrorList
 from django.db.models import Count
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from IPython import embed
 
 import models
 from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm
-from models import Post, Vote
+from models import Post, Vote, RelVote
+from rvotes import get_next_avail_vote, create_relvotes, RelList
+
 from alchemy_hooks import DBSession
 from alchemy_models import v0_relvote
+
 
 def home(request):
     posts = models.Post.objects.all()
@@ -54,6 +60,21 @@ def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
 
+def create_user(request):
+    uf = UserForm(request.POST or None)
+    if request.method == 'POST' and uf.is_valid():
+        user = User(username=uf.cleaned_data["username"],
+                    )
+        user.set_password(uf.cleaned_data["password"])
+        user.save()
+        create_relvotes(user)
+
+
+        return HttpResponse("USER MADE with uname: %s and pw: %s"%(user.username, user.password))
+
+    return render_to_response("create.html",
+            {'uf': uf},
+            RequestContext(request))
 
 def post_view(request, id_num, pform=None):
     post = get_object_or_404(Post, pk=id_num)
@@ -66,9 +87,16 @@ def post_view(request, id_num, pform=None):
     else:
         children = [{'post': p, 'childs': p.children.all()[0:2]} for p in children]
     """
+    temp_args = {'post' : post, 'p_struct':children, 'pform': pform}
+    temp_args['prof_user'] = request.user
+    votes = RelVote.objects.filter(user=request.user).all()
+    rel_o = RelList(votes)
+    temp_args['rel_o'] = rel_o
+    temp_args['now'] = datetime.now()
+
 
     return render_to_response('post.html',
-            {'post' : post, 'p_struct':children, 'pform': pform},
+            temp_args,
             RequestContext(request))
 
 def sub_post(request, id_num): #for nested posts
@@ -109,15 +137,30 @@ def vote(request, id_num):
         return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 
-@login_required
+@login_required(login_url="/login", )
 @require_http_methods(["POST",])
 def rel_vote(request, id_num):
     rvf = RelVoteForm(request.POST)
     post = get_object_or_404(Post, pk=id_num)
     user = request.user
     if rvf.is_valid():
-        session = DBSession()
-        li = session.query(v0_relvote).all()
-        return HttpResponse(str(li))
-        #return HttpResponseRedirect(request.META["HTTP_REFERER"])
+        votes = RelVote.objects.filter(user=user).all()
+        rel_o = RelList(votes)
+        rel_o.regen_vote_expires(post)
+        return HttpResponseRedirect(request.META["HTTP_REFERER"])
+
+
+def profile(request, username):
+    temp_args = {}
+    if request.user.is_authenticated and request.user.username == username:
+        temp_args["my_profile"] = True
+    user = User.objects.get(username=username)
+    temp_args['prof_user'] = user
+    votes = RelVote.objects.filter(user=user).all()
+    rel_o = RelList(votes)
+    temp_args['rel_o'] = rel_o
+    temp_args['now'] = datetime.now()
+    return render_to_response('profile.html',
+            temp_args,
+            RequestContext(request))
 

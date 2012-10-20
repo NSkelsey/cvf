@@ -1,3 +1,5 @@
+{% load template_extensions %}
+
 <div class="post_head row" >
   <div class="span1 point_box">
     <h5 class=votes >{{ post.vote_set.count }}</h5>
@@ -6,7 +8,7 @@
       <input type=submit class=vote_button value=&uArr; >
       </form >
       
-      <h5 class=rel_votes >{{ post.relvote_set.count }}</h5>
+      <h5 class=rel_votes >{{ post|rel_count }}</h5>
     <form method=post action="/posts/{{ post.id }}/rvote" >
       {% csrf_token %}
       <input type=submit class=vote_button value=&uArr; >

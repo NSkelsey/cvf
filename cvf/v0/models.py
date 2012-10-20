@@ -34,8 +34,8 @@ class Vote(models.Model):
 
 class RelVote(models.Model):
     user = models.ForeignKey(User)
-    post = models.ForeignKey(Post)
-    parent_post = models.ForeignKey(Post, related_name="child_relvote")
+    post = models.ForeignKey(Post, null=True)
+    parent_post = models.ForeignKey(Post, related_name="child_relvote", null=True)
     date_expire = models.DateTimeField()
     _next = models.ForeignKey('self', null=True)
 

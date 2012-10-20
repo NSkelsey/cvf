@@ -12,4 +12,6 @@ urlpatterns = patterns('',
     url(r'^make_post$', views.make_post),
     url(r'^login$', views.login),
     url(r'^logout$', views.logout),
+    url(r'^create$', views.create_user),
+    url(r'^user/(?P<username>\S+)$', views.profile),
 )

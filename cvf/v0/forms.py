@@ -12,7 +12,7 @@ class PostForm(ModelForm):
                 "body" : Textarea(attrs={'cols':200,'rows':10}),
                 }
 
-class UserForm(forms.Form):
+class UserForm(ModelForm):
     class Meta:
         model = User
         fields = ('username', 'password')
