@@ -167,7 +167,7 @@ def profile(request, username):
     RelPosFormSet = formset_factory(RelPositionForm, extra=9)
     data = rel_o.make_data_fs()
     rpfs = RelPosFormSet(data)
-    temp_args = {'formset': rpfs}
+    temp_args['formset'] = rpfs
     formlist = []
     for i in range(len(rpfs)):
         formlist.append((rpfs[i], rel_o.votes[i]))
