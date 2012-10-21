@@ -31,3 +31,7 @@ class VoteForm(forms.Form):
 class RelVoteForm(forms.Form):
     pass
 
+
+class RelPositionForm(forms.Form):
+    position = forms.IntegerField()
+    post_id = forms.IntegerField()

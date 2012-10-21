@@ -1,21 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+
 <div class=row>
   <div class="span6 offset3">
-    <h4> {{ prof_user.username }}'s Profile </h4> {{ now|date:"h:i:s"  }}
+    <h4> {{ prof_user }}'s Profile </h4> {{ now|date:"h:i:s"  }}
   </div>
 </div>
 
-{% for vote in rel_o.votes %}
-<div class=row>
-  <div class=span6>
-    {{ vote.date_expire|date:"h:i:s"  }} Post: {{ vote.post.title }}
+<form method="post" action="/user/{{ user }}/rvotes/rf">
+{% csrf_token %}
+{{ formset.management_form }}
+<ul id="sortable">
+{% for form, vote in formlist %}
+<li><div class="row rvote">
+  <div class="span6">
+    {% for field in form %}
+    {{ field }}
+    {% endfor %}
+    {{ vote.date_expire|date:" h:i:s D M Y"  }} <a href="/posts/{{ vote.post.id }}">{{ vote.post.title }}</a>
   </div>
-</div>
+</div></li>
 {% endfor %}
+</ul>
+  <input id=rvote type=submit value=Post>
+</form>
+<script src="{{ STATIC_URL }}stack.js" type=text/javascript ></script>
 {% endblock content %}
-
 
 
 

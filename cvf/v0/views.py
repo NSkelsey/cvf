@@ -10,11 +10,12 @@ from django.db.models import Count
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.forms.formsets import formset_factory
 
 from IPython import embed
 
 import models
-from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm
+from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm, RelPositionForm
 from models import Post, Vote, RelVote
 from rvotes import get_next_avail_vote, create_relvotes, RelList
 
@@ -89,10 +90,11 @@ def post_view(request, id_num, pform=None):
     """
     temp_args = {'post' : post, 'p_struct':children, 'pform': pform}
     temp_args['prof_user'] = request.user
-    votes = RelVote.objects.filter(user=request.user).all()
-    rel_o = RelList(votes)
-    temp_args['rel_o'] = rel_o
-    temp_args['now'] = datetime.now()
+    if request.user.is_authenticated():
+        votes = RelVote.objects.filter(user=request.user).all()
+        rel_o = RelList(votes)
+        temp_args['rel_o'] = rel_o
+        temp_args['now'] = datetime.now()
 
 
     return render_to_response('post.html',
@@ -146,7 +148,7 @@ def rel_vote(request, id_num):
     if rvf.is_valid():
         votes = RelVote.objects.filter(user=user).all()
         rel_o = RelList(votes)
-        rel_o.regen_vote_expires(post)
+        rel_o.push_vote_regen(post)
         return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 
@@ -155,11 +157,21 @@ def profile(request, username):
     if request.user.is_authenticated and request.user.username == username:
         temp_args["my_profile"] = True
     user = User.objects.get(username=username)
+
     temp_args['prof_user'] = user
     votes = RelVote.objects.filter(user=user).all()
     rel_o = RelList(votes)
     temp_args['rel_o'] = rel_o
     temp_args['now'] = datetime.now()
+
+    RelPosFormSet = formset_factory(RelPositionForm, extra=9)
+    data = rel_o.make_data_fs()
+    rpfs = RelPosFormSet(data)
+    temp_args = {'formset': rpfs}
+    formlist = []
+    for i in range(len(rpfs)):
+        formlist.append((rpfs[i], rel_o.votes[i]))
+    temp_args['formlist'] = formlist
     return render_to_response('profile.html',
             temp_args,
             RequestContext(request))
