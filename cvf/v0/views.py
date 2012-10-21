@@ -17,7 +17,8 @@ from IPython import embed
 import models
 from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm, RelPositionForm
 from models import Post, Vote, RelVote
-from rvotes import get_next_avail_vote, create_relvotes, RelList
+from rvotes import get_next_avail_vote, create_relvotes, RelList, make_vote_list
+import rvotes
 
 from alchemy_hooks import DBSession
 from alchemy_models import v0_relvote
@@ -157,8 +158,8 @@ def profile(request, username):
     if request.user.is_authenticated and request.user.username == username:
         temp_args["my_profile"] = True
     user = User.objects.get(username=username)
-
     temp_args['prof_user'] = user
+
     votes = RelVote.objects.filter(user=user).all()
     rel_o = RelList(votes)
     temp_args['rel_o'] = rel_o
@@ -175,4 +176,23 @@ def profile(request, username):
     return render_to_response('profile.html',
             temp_args,
             RequestContext(request))
+
+@login_required(login_url="/login")
+@require_http_methods(["POST",])
+def reorder_rvotes(request, username):
+    user = User.objects.get(username=username)
+    if request.user == user:
+        RelPosFormSet = formset_factory(RelPositionForm)
+        rpfs = RelPosFormSet(request.POST)
+        order = []
+        if rpfs.is_valid() and len(rpfs) == rvotes.NUM_RELVOTES:
+            for i in range(len(rpfs)):
+                form = rpfs[i]
+                post_id  = form.cleaned_data["post_id"]
+                order.append(post_id)
+        votes = make_vote_list(order, user)
+        rl = RelList(votes)
+        rl.update_expire_time()
+        return HttpResponseRedirect(request.META["HTTP_REFERER"])
+
 

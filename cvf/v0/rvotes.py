@@ -76,6 +76,20 @@ class RelList:
         self.votes.append(new_vote)
         self.save_votes()
 
+    def update_expire_time(self):
+        now = datetime.now()
+        for i in range(len(self.votes)):
+            self.votes[i].date_expire = now + tdelta*(i+1)
+        self.save_votes()
+
+
+def make_vote_list(order, user):
+    votes = RelVote.objects.filter(user=user).all()
+    votes = sorted(votes, key=lambda vote: vote.date_expire)
+    for i in range(len(votes)):
+        post_id = order[i]
+        votes[i].post_id = post_id
+    return votes
 
 
 def create_relvotes(user):

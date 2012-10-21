@@ -9,15 +9,15 @@
   </div>
 </div>
 
-<form method="post" action="/user/{{ user }}/rvotes/rf">
+<form method="post" action="/rvotes/update/{{ user }}">
 {% csrf_token %}
 {{ formset.management_form }}
-<ul id="sortable">
+<ol id="sortable">
 {% for form, vote in formlist %}
-<li><div class="row rvote">
+<li class="rvote"><div class="row rvote">
   <div class="span6">
     {% for field in form %}
-    {{ field }}
+    {{ field.as_hidden }}
     {% endfor %}
     {{ vote.date_expire|date:" h:i:s D M Y"  }} <a href="/posts/{{ vote.post.id }}">{{ vote.post.title }}</a>
   </div>

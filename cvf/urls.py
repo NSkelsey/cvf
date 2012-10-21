@@ -13,5 +13,6 @@ urlpatterns = patterns('',
     url(r'^login$', views.login),
     url(r'^logout$', views.logout),
     url(r'^create$', views.create_user),
+    url(r'^rvotes/update/(?P<username>\S+)$', views.reorder_rvotes),
     url(r'^user/(?P<username>\S+)$', views.profile),
 )
