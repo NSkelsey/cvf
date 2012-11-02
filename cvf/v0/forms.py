@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.forms import ModelForm, Textarea
 from django.contrib.auth.models import User
@@ -35,3 +37,19 @@ class RelVoteForm(forms.Form):
 class RelPositionForm(forms.Form):
     position = forms.IntegerField()
     post_id = forms.IntegerField()
+
+
+class AliasForm(forms.Form):
+    name = forms.CharField()
+
+    def clean(self):
+        cleaned_data = super(AliasForm, self).clean()
+        name = cleaned_data.get("name")
+        if len(name) <= 0:
+            raise forms.ValidationError("Name cannot be empty")
+        upper = "[A-Z]"
+        num = "[0-9]" #\d
+        if re.search(upper, name) and re.search(num, name):
+            return cleaned_data
+        else:
+            raise forms.ValidationError("Aliases must have at least one uppercase letter and one number.")

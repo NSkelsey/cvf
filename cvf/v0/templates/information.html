@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% for user in users %}
+<div class=row>
+  <div class="span3 offset1">
+    <a href="/users/{{ user }}">{{ user }}</a>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock content %}

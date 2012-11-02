@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="span8">
+    {% if post.parent.id %}
+    <a href="/posts/{{ post.parent.id }}">^ Parent ^</a>
+    {% else %}
+    <a href="/">^ back home ^</a>
+    {% endif %}
+  </div>
+</div>
+<div class=toppost>
+{% include 'post_head.html' %}
+</div>
+<div class=row>
+  <div class=span12>
+<div class="well">
+  <p>
+  {{ post.body }}
+  </p>
+</div>
+</div>
+</div>
+

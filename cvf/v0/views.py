@@ -11,23 +11,74 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.forms.formsets import formset_factory
-
+from sqlalchemy import select, func
 from IPython import embed
 
 import models
-from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm, RelPositionForm
+from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm, RelPositionForm, AliasForm
 from models import Post, Vote, RelVote
 from rvotes import get_next_avail_vote, create_relvotes, RelList, make_vote_list
+from alchemy_hooks import session, sa_post, sa_relvote
 import rvotes
-
-from alchemy_hooks import DBSession
-from alchemy_models import v0_relvote
-
 
 def home(request):
     posts = models.Post.objects.all()
     return render_to_response("home.html",
             {"posts": posts},
+            RequestContext(request))
+
+def principles(request):
+    return render_to_response("principles.html",
+            {},
+            RequestContext(request))
+
+def information(request):
+    users = User.objects.all()
+    return render_to_response("information.html",
+            {'users' : users},
+            RequestContext(request))
+
+def most_relevant(request):
+    timer = datetime.now()
+    join = sa_post.join(sa_relvote, onclause=(sa_relvote.c.post_id==sa_post.c.id))
+    sel = select([sa_post.c.id, func.count(sa_relvote.c.id).label("votes")], whereclause=sa_relvote.c.date_expire > datetime.now(), 
+            from_obj=[join]).group_by(sa_post.c.id).order_by("votes DESC")
+    ps = session.execute(sel).fetchall()
+    print ps
+    delta = datetime.now() - timer
+    print delta
+    if not ps:
+        messages.info(request, "This site has nothing relevant green vote on something")
+    try:
+        _id = ps[0][0]
+        post = Post.objects.get(pk=_id)
+    except:
+        post = Post.objects.get(pk=1)
+    temp_args = {'post' : post}
+    children = list(Post.objects.filter(parent=post)\
+            .annotate(num_votes=Count('vote'))\
+            .order_by('-num_votes'))
+    temp_args['p_struct'] = children
+    temp_args['prof_user'] = request.user
+    return render_to_response("most_relevant.html",
+            temp_args,
+            RequestContext(request))
+
+def most_discussed(request):
+    sel = select([sa_post.c.parent_id, func.count(sa_post.c.id).label("childs")], 
+            whereclause=(sa_post.c.parent_id != None),
+            from_obj=[sa_post])\
+            .group_by(sa_post.c.parent_id).order_by("childs DESC")
+    p_id = session.execute(sel).first()[0]
+    post = Post.objects.get(pk=p_id)
+    temp_args = {'post' : post}
+    children = list(Post.objects.filter(parent=post)\
+            .annotate(num_votes=Count('vote'))\
+            .order_by('-num_votes'))
+    temp_args['p_struct'] = children
+    temp_args['prof_user'] = request.user
+    return render_to_response("most_discussed.html",
+            temp_args,
             RequestContext(request))
 
 def make_post(request): #for commiting posts to the forum proper
@@ -80,15 +131,11 @@ def create_user(request):
 
 def post_view(request, id_num, pform=None):
     post = get_object_or_404(Post, pk=id_num)
-    children = list(Post.objects.filter(parent=post)\
+    rel_o = Post.objects.select_related().filter(parent=post)\
             .annotate(num_votes=Count('vote'))\
-            .order_by('-num_votes'))
+            .order_by('-num_votes')
+    children = list(rel_o)
     pform = PostForm()
-    """if len(children) > 3:
-        children = [{'post': p, 'childs': p.children.all()} for p in children]
-    else:
-        children = [{'post': p, 'childs': p.children.all()[0:2]} for p in children]
-    """
     temp_args = {'post' : post, 'p_struct':children, 'pform': pform}
     temp_args['prof_user'] = request.user
     if request.user.is_authenticated():
@@ -96,8 +143,6 @@ def post_view(request, id_num, pform=None):
         rel_o = RelList(votes)
         temp_args['rel_o'] = rel_o
         temp_args['now'] = datetime.now()
-
-
     return render_to_response('post.html',
             temp_args,
             RequestContext(request))
@@ -152,12 +197,10 @@ def rel_vote(request, id_num):
         rel_o.push_vote_regen(post)
         return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
-
-def profile(request, username):
+@login_required(login_url="/login",)
+def profile(request):
+    user = request.user
     temp_args = {}
-    if request.user.is_authenticated and request.user.username == username:
-        temp_args["my_profile"] = True
-    user = User.objects.get(username=username)
     temp_args['prof_user'] = user
 
     votes = RelVote.objects.filter(user=user).all()
@@ -173,7 +216,27 @@ def profile(request, username):
     for i in range(len(rpfs)):
         formlist.append((rpfs[i], rel_o.votes[i]))
     temp_args['formlist'] = formlist
+    temp_args['alias_form'] = AliasForm()
     return render_to_response('profile.html',
+            temp_args,
+            RequestContext(request))
+
+@login_required(login_url="/login", )
+@require_http_methods(["POST",])
+def alias_sub(request):
+    af = AliasForm(request.POST)
+    if not af.is_valid():
+        messages.error(request, af.errors)
+    messages.info(request, "alias posted! nothing done")
+    return HttpResponseRedirect(request.META["HTTP_REFERER"])
+
+
+def user_profile(request, username):
+    temp_args = {}
+    if request.user.is_authenticated and request.user.username == username:
+        return HttpResponseRedirect("/profile")
+    user = User.objects.get(username=username)
+    return render_to_response('user_profile.html',
             temp_args,
             RequestContext(request))
 

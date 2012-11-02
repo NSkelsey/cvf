@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 constants = {
         "Post" : {
             "body" :  {
@@ -39,7 +40,17 @@ class RelVote(models.Model):
     date_expire = models.DateTimeField()
     _next = models.ForeignKey('self', null=True)
 
+#cronjob will run through and expire these votes
+class ExpiredRelVote(RelVote):
+    date_retired = models.DateTimeField(auto_now=True)
+
+
 class UserProfile(models.Model):
-    user = models.ForeignKey(User, unique=True)
+    user = models.ForeignKey(User, unique=True, related_name="profile")
     authd = models.BooleanField()
+    alias = models.ForeignKey('Alias', unique=True, related_name="user")
+
+class Alias(models.Model):
+    date_expire = models.DateTimeField(auto_now=True)
+
 

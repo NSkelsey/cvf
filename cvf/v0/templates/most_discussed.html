@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+
 {% block content %}
+This is the most dicussed post on this site right now.
 
-
-{% include "post_body.html" %}
+{% include 'post_body.html' %}
 
 {% for post in p_struct %}
   {% include 'post_tree.html' %}
@@ -11,8 +12,6 @@
 {% endfor %}
 
 
-{% include 'post_form.html' %}
-
-
 {% endblock content %}
+
 

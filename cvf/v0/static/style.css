@@ -83,3 +83,11 @@ h5.identifier {
   float: right;
   color: red;
 }
+
+#relvote_stack {
+  margin-left: 200px;
+}
+
+div.alias {
+  margin: 20px;
+}

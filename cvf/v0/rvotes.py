@@ -47,21 +47,6 @@ class RelList:
             if vote.date_expire > now:
                 if first == -1:
                     first = i
-                    """if i == 0 and (vote.date_expire - 2*tdelta) < now:
-                        lower_delta = (vote.date_expire - now).total_seconds()
-                        print "now " + str(now)
-                        print "date expire " + str(vote.date_expire)
-                        print "lower delta " +  str(lower_delta)
-                        remainder = lower_delta%period
-                        if remainder > .20*period:
-                            print "randomizing"
-                            offset = randrange(int(.20*period), period)
-                        else:
-                            offset = int(remainder)
-                        vote.date_expire = now + timedelta(seconds=offset)
-                        print "offset " + str(remainder)
-                        print "remainder " + str(remainder)
-                    else:"""
                     diff = timedelta(seconds=offset) + tdelta*i
                     vote.date_expire = now + diff
                 else:

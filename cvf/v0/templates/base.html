@@ -27,13 +27,13 @@
           <ul class="nav">
             <li><a href="/">Home</a></li>
             <li class="divider-vertical"></li>
-            <li><a href="#">Principles</a></li>
+            <li><a href="/principles">Principles</a></li>
             <li class="divider-vertical"></li>
-            <li><a href="#">Most Discussed</a></li>
+            <li><a href="/most-discussed">Most Discussed</a></li>
             <li class="divider-vertical"></li>
-            <li><a href="#">Most Relevant</a></li>
+            <li><a href="/most-relevant">Most Relevant</a></li>
             <li class="divider-vertical"></li>
-            <li><a href="#">Information</a></li>
+            <li><a href="/information">Information</a></li>
             <li class="divider-vertical"></li>
           </ul>
           <ul class="nav pull-right">
@@ -66,16 +66,23 @@
           </div>
         </div>
         {% if messages %}
+          {% for message in messages %}
         <div class=row>
           <div class=span10>
+         {% if message.tags == 'warning' %}
         <div class="alert alert-block messages">
+          {% elif message.tags == 'info' %}
+        <div class="alert alert-info messages">
+          {% elif message.tags == 'error' %}
+        <div class="alert alert-error messages">
+          {% endif %}
+          
            <button type="button" class="close" data-dismiss="alert">×</button>
-          {% for message in messages %}
           {% if message.tags %} {{ message.tags|capfirst }}! {% endif %} {{ message }}
-          {% endfor %}
         </div>
         </div>
       </div>
+          {% endfor %}
         {% endif %}
       </div>
         {% block content %}
