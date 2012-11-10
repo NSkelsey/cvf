@@ -32,7 +32,10 @@ class RelList:
             s = "form-" + str(i) + "-position"
             t = "form-" + str(i) + "-post_id"
             data[s] = i
-            data[t] = vote.post.id
+            _id = None
+            if vote.post is not None:
+                _id = vote.post.id
+            data[t] = _id
             i += 1
         return data
 

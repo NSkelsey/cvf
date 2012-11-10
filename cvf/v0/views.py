@@ -21,8 +21,11 @@ from rvotes import get_next_avail_vote, create_relvotes, RelList, make_vote_list
 from alchemy_hooks import session, sa_post, sa_relvote
 import rvotes
 
+import view_funcs
+
 def home(request):
-    posts = models.Post.objects.all()
+    #posts = models.Post.objects.filter(parent=None).all()
+    posts = view_funcs.preload_front()
     return render_to_response("home.html",
             {"posts": posts},
             RequestContext(request))
@@ -87,6 +90,7 @@ def make_post(request): #for commiting posts to the forum proper
         if pform.is_valid():
             post = pform.save(commit=False)
             post.user = request.user
+            post.username = request.username
             post.save()
             return HttpResponseRedirect("/")
     return render_to_response("post_form.html",
@@ -116,15 +120,10 @@ def logout(request):
 def create_user(request):
     uf = UserForm(request.POST or None)
     if request.method == 'POST' and uf.is_valid():
-        user = User(username=uf.cleaned_data["username"],
-                    )
-        user.set_password(uf.cleaned_data["password"])
-        user.save()
-        create_relvotes(user)
-
-
-        return HttpResponse("USER MADE with uname: %s and pw: %s"%(user.username, user.password))
-
+        username = uf.cleaned_data["username"]
+        password = uf.cleaned_data["password"]
+        user = view_funcs.make_new_user(username, password)
+        return HttpResponse("USER MADE with uname: %s and pw: %s"%(user.username, password))
     return render_to_response("create.html",
             {'uf': uf},
             RequestContext(request))
@@ -168,6 +167,7 @@ def sub_post(request, id_num): #for nested posts
             return render_to_response("post_form.html",
                     {'pform' : pform, 'post':parent},
                     RequestContext(request))
+    messages.error(request, "You must be logged in to do that!")
     return HttpResponseRedirect("/posts/"+id_num)
 
 @require_http_methods(["POST",])
@@ -236,6 +236,9 @@ def user_profile(request, username):
     if request.user.is_authenticated and request.user.username == username:
         return HttpResponseRedirect("/profile")
     user = User.objects.get(username=username)
+    posts = list(Post.objects.filter(user=user).order_by("date")[0:25].all())
+    temp_args['user'] = user
+    temp_args['posts'] = posts
     return render_to_response('user_profile.html',
             temp_args,
             RequestContext(request))

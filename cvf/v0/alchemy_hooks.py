@@ -15,6 +15,7 @@ session = DBSession()
 bridge = Bridge()
 sa_post = bridge[models.Post]
 sa_relvote = bridge[models.RelVote]
+sa_vote = bridge[models.Vote]
 
 cmd = "sqlautocode mysql://dba:mypass@localhost:3306/forum -o alchemy_models.py --force"
 

@@ -2,28 +2,36 @@
 
 <div class="post_head row" >
   <div class="span1 point_box">
-    <h5 class=votes >{{ post.vote_set.count }}</h5>
-    <form method=post action="/posts/{{ post.id }}/vote" >
+    <form class=vote method=post action="/posts/{{ post.id }}/vote" >
       {% csrf_token %}
-      <input type=submit class=vote_button value=&uArr; >
-      </form >
-      <h5 class=rel_votes >{{ post|rel_count }}</h5>
-    <form method=post action="/posts/{{ post.id }}/rvote" >
-      {% csrf_token %}
-      <input type=submit class=vote_button value=&uArr; >
-      </form >
+      <input type="submit" class="vote_button" value="" >
+      </form > 
+      {% if post.vote_count >= 0 %}
+      <div class="votes score" >{{ post.vote_count }}</div>
+      {% else %}
+        <div class="votes score" >{{ post.vote_set.count }}</div>
+        {% endif%}
+      
+      <form class=vote method=post action="/posts/{{ post.id }}/rvote" >
+        {% csrf_token %}
+        <input type=submit class="vote_button rel_vote" value="" >
+        </form >
+        {% if post.rel_count >= 0 %}
+        <div class="rel_votes score" >{{ post.rel_count }}</div>
+        {% else %}
+        <div class="rel_votes score" >{{ post.relvote_set.count }}</div>
+        {% endif%}
+      </div>
 
+      <div class="span11 title">
+        <blockquote id=bq class=title >
+          <p><a class=lead href="/posts/{{ post.id }}">{{ post.title }}</a></p>
+          <small>Posted by <a href="/user/{{ post.username }}">{{ post.username }}</a> on {{ post.date|date:"m/d/Y" }} with {{ post.children.all|length }} direct children</small>
+          {% if post.identifier > 0 %}
+          <h5 class=identifier>({{ post.identifier }})</h5>
+          {% endif %}
+        </blockquote>
+      </div>
     </div>
-
-    <div class="span11 title">
-      <blockquote id=bq class=title >
-        <p><a class=lead href="/posts/{{ post.id }}">{{ post.title }}</a></p>
-        <small>Posted by <a href="/users/{{ post.user }}">{{ post.user }}</a> on {{ post.date|date:"m/d/Y" }} with {{ post.children.all|length }} direct children</small>
-        {% if post.identifier > 0 %}
-        <h5 class=identifier>({{ post.identifier }})</h5>
-        {% endif %}
-      </blockquote>
-    </div>
-  </div>
 
 

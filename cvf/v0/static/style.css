@@ -68,6 +68,7 @@ div.title {
 }
 div.rel_votes{
   color: green;
+  margin-bottom: 2px;
 }
 
 div.children{
@@ -90,4 +91,28 @@ h5.identifier {
 
 div.alias {
   margin: 20px;
+}
+
+form.vote {
+  margin: 0px;
+}
+
+input.vote_button {
+  background-image:url('orange_triangle.png');
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 15px;
+  padding: 0px;
+  border: 0px;
+  background-color: transparent;
+  margin-top: 3px;
+}
+
+input.rel_vote {
+  background-image:url('green_triangle.png');
+}
+
+div.score {
+  margin-top: 0px;
+  margin-left: 6px;
 }

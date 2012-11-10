@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<p>
+This is {{ user.username }}'s profile.
+</p>
+<p>
+User joined on {{ user.date_joined }}
+</p>
+<p>
+These are this user's posts:
+</p>
 
-temp user prof
+{% for post in posts %}
+{% include 'post_head.html' %}
+{% endfor %}
 
 {% endblock content %}
 
