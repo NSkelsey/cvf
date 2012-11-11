@@ -75,9 +75,9 @@ div.children{
   padding-left: 80px;
 }
 
-.post_form > Textarea, #id_title
+.post_form > Textarea, #id_title, #id_summary
 {
-width: 950px;
+width: 800px;
 }
 
 h5.identifier {
@@ -95,6 +95,7 @@ div.alias {
 
 form.vote {
   margin: 0px;
+  display: inline;
 }
 
 input.vote_button {
@@ -115,4 +116,38 @@ input.rel_vote {
 div.score {
   margin-top: 0px;
   margin-left: 6px;
+}
+
+
+blockquote small::before {
+content: none;
+}
+
+
+div.orange_box {
+  float: left;
+}
+
+div.green_box {
+  float: right;
+  margin-right: 10px;
+}
+
+div.point_box {
+  margin-left: 10px;
+}
+
+.lead {
+font-size: 18px;
+}
+
+p.summary {
+padding-left: 20px;
+}
+
+div.gbg {
+background-color: #74C296;
+}
+div.ojbg {
+background-color: #EDC54E;
 }

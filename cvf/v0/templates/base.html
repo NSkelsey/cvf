@@ -75,8 +75,9 @@
         <div class="alert alert-info messages">
           {% elif message.tags == 'error' %}
         <div class="alert alert-error messages">
+          {% elif message.tags == 'success' %}
+        <div class="alert alert-success messages">
           {% endif %}
-          
            <button type="button" class="close" data-dismiss="alert">×</button>
           {% if message.tags %} {{ message.tags|capfirst }}! {% endif %} {{ message }}
         </div>

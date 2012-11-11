@@ -31,6 +31,17 @@ def preload_front():
     print "time delay is " + str(td.microseconds/1000)
     return posts
 
+def make_vid_sets(uid):
+    vsel = select([sa_vote.c.post_id], whereclause=sa_vote.c.user_id==uid,  #DJANGO USERID
+                 from_obj=[sa_vote])
+    vote_set = set([_id[0] for (_id) in session.execute(vsel).fetchall()])
+    rvsel = select([sa_relvote.c.post_id],
+            whereclause=and_(sa_relvote.c.user_id==uid, rvotes.now_clause()),
+            from_obj=[sa_relvote])
+    rvote_set = set([_id[0] for (_id) in session.execute(rvsel).fetchall()])
+    return (vote_set, rvote_set)
+
+
 
 def make_new_user(username, password):
     user = User.objects.create_user(username, password=password)

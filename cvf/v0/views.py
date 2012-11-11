@@ -2,7 +2,7 @@ from datetime import datetime
 
 import django
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth, messages
 from django.forms.util import ErrorList
@@ -14,10 +14,9 @@ from django.forms.formsets import formset_factory
 from sqlalchemy import select, func
 from IPython import embed
 
-import models
 from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm, RelPositionForm, AliasForm
 from models import Post, Vote, RelVote
-from rvotes import get_next_avail_vote, create_relvotes, RelList, make_vote_list
+from rvotes import RelList, make_vote_list
 from alchemy_hooks import session, sa_post, sa_relvote
 import rvotes
 
@@ -26,13 +25,24 @@ import view_funcs
 def home(request):
     #posts = models.Post.objects.filter(parent=None).all()
     posts = view_funcs.preload_front()
+    temp_args = {'posts' : posts}
+    #MAKE VIDSET
+    if request.user.is_authenticated():
+        vset, rset = view_funcs.make_vid_sets(request.user.id)
+        temp_args['vset'] =  vset
+        temp_args['rset'] =  rset
     return render_to_response("home.html",
-            {"posts": posts},
+            temp_args,
             RequestContext(request))
 
 def principles(request):
+    f = open('CPF Principles.txt', 'r')
+    post = f.read()
+    f.close()
+    print post
+    temp_args = {'post' : post}
     return render_to_response("principles.html",
-            {},
+            temp_args,
             RequestContext(request))
 
 def information(request):
@@ -163,11 +173,14 @@ def sub_post(request, id_num): #for nested posts
                         user=request.user,
                         identifier=check_int)
             post.save()
+            messages.success(request, "Post submitted correctly")
         else:
+            # TODO
+            ### meaningful errors here would be helpful
+           ### messages.error(request, pform.errors)
             return render_to_response("post_form.html",
                     {'pform' : pform, 'post':parent},
                     RequestContext(request))
-    messages.error(request, "You must be logged in to do that!")
     return HttpResponseRedirect("/posts/"+id_num)
 
 @require_http_methods(["POST",])

@@ -3,6 +3,7 @@ from random import randrange
 from django.utils import timezone
 
 from models import RelVote
+import alchemy_hooks
 NUM_RELVOTES = 10
 
 # change these as nessecary
@@ -98,6 +99,11 @@ def get_next_avail_vote(votes):
         else:
             print vote.post.title
     return v
+
+def now_clause():
+    now = datetime.now()
+    clause = alchemy_hooks.sa_relvote.c.date_expire > now
+    return clause
 
 
 

@@ -20,10 +20,13 @@ class Post(models.Model):
     edited = models.BooleanField(blank=True)
     parent = models.ForeignKey('self', blank=True, null=True, related_name="children")
     identifier = models.IntegerField(default=0)
+    summary = models.CharField(max_length=1000, null=True, blank=True)
 
     def __repr__(self):
         relvotes = int(self.relvote_set.count())
         votes = int(self.vote_set.count())
+        if self.comment:
+            return u"<Comment title: %s, Num votes: %s, Num Relvotes %s>" % (self.title, votes, relvotes)
         return u"<Post title: %s, Num votes: %s, Num Relvotes %s>" % (self.title, votes, relvotes)
 
 class Revision(models.Model):

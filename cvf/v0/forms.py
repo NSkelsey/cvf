@@ -9,10 +9,19 @@ import models
 class PostForm(ModelForm):
     class Meta:
         model = models.Post
-        fields = ('title', 'body')
+        fields = ('title','summary', 'body')
         widgets = {
                 "body" : Textarea(attrs={'cols':200,'rows':10}),
                 }
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = models.Post
+        fields = ('summary',)
+        widgets = {
+                "summary" : Textarea(attrs={'cols':150,'rows':5}),
+                }
+
 
 class UserForm(ModelForm):
     class Meta:

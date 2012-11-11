@@ -2,25 +2,36 @@
 
 <div class="post_head row" >
   <div class="span1 point_box">
-    <form class=vote method=post action="/posts/{{ post.id }}/vote" >
-      {% csrf_token %}
-      <input type="submit" class="vote_button" value="" >
-      </form > 
-      {% if post.vote_count >= 0 %}
-      <div class="votes score" >{{ post.vote_count }}</div>
-      {% else %}
-        <div class="votes score" >{{ post.vote_set.count }}</div>
-        {% endif%}
-      
-      <form class=vote method=post action="/posts/{{ post.id }}/rvote" >
+   {% if post.id in vset %}
+    <div class="orange_box ojbg">
+   {% else %}
+    <div class="orange_box">
+    {% endif %}
+      <form class=vote method=post action="/posts/{{ post.id }}/vote" >
         {% csrf_token %}
-        <input type=submit class="vote_button rel_vote" value="" >
-        </form >
-        {% if post.rel_count >= 0 %}
-        <div class="rel_votes score" >{{ post.rel_count }}</div>
+        <input type="submit" class="vote_button" value="" >
+        </form > 
+        {% if post.vote_count >= 0 %}
+        <div class="votes score" >{{ post.vote_count }}</div>
         {% else %}
-        <div class="rel_votes score" >{{ post.relvote_set.count }}</div>
-        {% endif%}
+        <div class="votes score" >{{ post.vote_set.count }}</div>
+        {% endif %}
+      </div>
+      {% if post.id in rset %}
+      <div class="green_box gbg" >
+      {% else %}
+      <div class="green_box" >
+      {% endif %}
+        <form class=vote method=post action="/posts/{{ post.id }}/rvote" >
+          {% csrf_token %}
+          <input type=submit class="vote_button rel_vote" value="" >
+          </form >
+          {% if post.rel_count >= 0 %}
+          <div class="rel_votes score" >{{ post.rel_count }}</div>
+          {% else %}
+          <div class="rel_votes score" >{{ post.relvote_set.count }}</div>
+          {% endif%}
+        </div>
       </div>
 
       <div class="span11 title">
@@ -31,6 +42,7 @@
           <h5 class=identifier>({{ post.identifier }})</h5>
           {% endif %}
         </blockquote>
+        <p class=summary >{{ post.summary }}</p>
       </div>
     </div>
 
