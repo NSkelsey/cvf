@@ -17,7 +17,7 @@ div.container.outer {
   height: auto !important;
   height: 100%;
   overflow:auto;
-  padding-bottom:120px; /* this needs to be bigger than footer height*/
+  padding-bottom:50px; /* this needs to be bigger than footer height*/
   margin-left: 10px;
   margin-right: 0px;
   width: 1250px;
@@ -47,13 +47,12 @@ div.row {
 }
 
 .footer {
-  margin-top: 10px;
-  padding-top: 10px;
   background-color: whiteSmoke;
-  margin-top: -120px; /* negative value of footer height */
-  height: 120px;
+  margin-top: -50px; /* negative value of footer height */
+  height: 30px;
   clear:both;
   padding-top:20px;
+  width: 100%;
 }
 
 div.navbar {

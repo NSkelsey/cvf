@@ -14,7 +14,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     body = models.CharField(max_length=constants["Post"]["body"]["max_length"])
     user = models.ForeignKey(User)
-    username = models.CharField(max_length=30)
+    aliasname = models.CharField(max_length=30)
     date = models.DateTimeField(auto_now_add=True)
     comment = models.BooleanField(blank=True)
     edited = models.BooleanField(blank=True)
@@ -72,7 +72,12 @@ class UserProfile(models.Model):
     authd = models.BooleanField()
 
 class Alias(models.Model):
-    aname = models.CharField(max_length=20)
-    user = models.ForeignKey(User, unique=True, related_name="aliases")
+    name = models.CharField(max_length=20, unique=True)
+    user = models.ForeignKey(User, related_name="aliases")
+
+def UtoA(user): #User to Alias conv
+    alias = Alias(name=user.username, user=user)
+    alias.save()
+    return alias
 
 

@@ -10,19 +10,22 @@ from IPython import embed
 
 setup_environ(settings)
 from django.contrib.auth.models import User
-from cvf.v0.models import Post, Vote, RelVote
+from cvf.v0.models import Post, Vote, RelVote, Alias, UtoA
 import cvf.v0.view_funcs as view_funcs
+from cvf.v0 import rvotes
 from datetime import datetime
 never = datetime(2022,1,1)
 
 harry = User.objects.order_by('?')
 if len(harry) > 0:
-    harry = harry[0]
+    harry = UtoA(harry[0])
 else:
     harry = User(username="harry")
     harry.set_password("a")
     harry.save()
-print type(harry)
+    rvotes.create_relvotes(harry)
+    harry = UtoA(harry)
+    harry.save()
 
 def get_uname(words):
     first = words[int(random.random()*len(words))]
@@ -57,11 +60,11 @@ def make_post(itr=1):
             parent = None
         user=User.objects.order_by('?')[0]
         post = Post(title=title_sec, body=post_sec, user=user,
-                username=user.username, summary=sum_sec, parent=parent)
+                aliasname=user.username, summary=sum_sec, parent=parent)
         post.save()
 
 def rand_posts():
-    initial_post = Post(title="first", body="yes", user=User(), username="Wee")
+    initial_post = Post(title="first", body="yes", user=User(), aliasname="Wee")
     make_user(15)
     make_post(100)
 
@@ -106,7 +109,7 @@ def make_souppost(posthtml):
         summary = "auto generated"
     else:
         summary = posthtml.em.text
-    post = Post(username='harry', user=harry, title=title, summary=summary)
+    post = Post(aliasname='harry', user=harry, title=title, summary=summary)
     post.save()
     soup_recurse(posthtml)
     create_votes(posthtml, post)
@@ -121,11 +124,11 @@ def make_soupcomment(html):
     if html.parent.name == 'p' or html.parent.name == 'div':
         parent = Post.objects.filter(title=html.parent.a.
                 text).all()[0]
-        post = Post(username='harry', comment=True, 
+        post = Post(aliasname='harry', comment=True, 
                 summary=summary, user=harry,          
                 parent=parent)
     else:
-        post = Post(username='harry',user=harry, comment=True, summary=summary)
+        post = Post(aliasname='harry',user=harry, comment=True, summary=summary)
     print "parent post"
     print post.parent
     post.save()
@@ -149,11 +152,8 @@ def make_copy():
 
 
 if __name__ == "__main__":
-
-
     parser = argparse.ArgumentParser() 
-    parser.add_argument('-p', type=str, help='Program name',
-           )
+    parser.add_argument('-p', type=str, help='Program name')
     parser.set_defaults(program="harry")
     args = parser.parse_args()
     if not args.program:

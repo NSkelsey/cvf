@@ -4,12 +4,13 @@ from datetime import datetime
 
 from sqlalchemy import select, func, and_
 
-from cvf.v0.alchemy_hooks import session, sa_post, sa_relvote
+from cvf.v0.alchemy_hooks import Session, sa_post, sa_relvote
 
 register = template.Library()
 
 @register.filter(name='rel_count')
 def field_type(value):
+    session = Session()
     now = datetime.now()
     post = value
     sel = select([func.count(sa_relvote.c.id)], whereclause=(and_(sa_relvote.c.post_id==post.id, sa_relvote.c.date_expire > now)), from_obj=[sa_relvote]).group_by(sa_relvote.c.post_id)

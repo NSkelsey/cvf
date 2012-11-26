@@ -1,13 +1,15 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
+import models
 from sqlalchemy import select, func, alias, and_
 from IPython import embed
 
-from alchemy_hooks import session, sa_post, sa_relvote, sa_vote
+from alchemy_hooks import Session, sa_post, sa_relvote, sa_vote
 import rvotes
 
 def preload_front():
+    session = Session()
     now = datetime.now()
     sel = select([sa_post,
         func.count(sa_relvote.c.id).label('rel_count'),],
@@ -26,12 +28,12 @@ def preload_front():
             ]
             ).group_by(sa_post.c.id).order_by('-rel_count')
     posts = session.execute(sel).fetchall()
-    session.close()
     td =  datetime.now() - now
     print "time delay is " + str(td.microseconds/1000)
     return posts
 
 def make_vid_sets(uid):
+    session = Session()
     vsel = select([sa_vote.c.post_id], whereclause=sa_vote.c.user_id==uid,  #DJANGO USERID
                  from_obj=[sa_vote])
     vote_set = set([_id[0] for (_id) in session.execute(vsel).fetchall()])
@@ -46,6 +48,8 @@ def make_vid_sets(uid):
 def make_new_user(username, password):
     user = User.objects.create_user(username, password=password)
     user.save()
+    alias = models.Alias(user=user, name=user.username)
+    alias.save()
     rvotes.create_relvotes(user) 
     return user
 

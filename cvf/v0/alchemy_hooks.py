@@ -9,8 +9,7 @@ from cvf.v0 import models
 
 Base = declarative_base()
 engine = create_engine('mysql://dba:mypass@localhost:3306/forum', echo=True)
-DBSession = scoped_session(sessionmaker(bind=engine))
-session = DBSession()
+Session = scoped_session(sessionmaker(bind=engine))
 
 bridge = Bridge()
 sa_post = bridge[models.Post]

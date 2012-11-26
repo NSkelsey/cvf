@@ -17,7 +17,7 @@ from IPython import embed
 from forms import PostForm, UserForm, LoginForm, VoteForm, RelVoteForm, RelPositionForm, AliasForm
 from models import Post, Vote, RelVote
 from rvotes import RelList, make_vote_list
-from alchemy_hooks import session, sa_post, sa_relvote
+from alchemy_hooks import Session, sa_post, sa_relvote
 import rvotes
 
 import view_funcs
@@ -27,6 +27,7 @@ def home(request):
     posts = view_funcs.preload_front()
     temp_args = {'posts' : posts}
     #MAKE VIDSET
+    Session.remove()
     if request.user.is_authenticated():
         vset, rset = view_funcs.make_vid_sets(request.user.id)
         temp_args['vset'] =  vset
@@ -52,6 +53,7 @@ def information(request):
             RequestContext(request))
 
 def most_relevant(request):
+    session = Session()
     timer = datetime.now()
     join = sa_post.join(sa_relvote, onclause=(sa_relvote.c.post_id==sa_post.c.id))
     sel = select([sa_post.c.id, func.count(sa_relvote.c.id).label("votes")], whereclause=sa_relvote.c.date_expire > datetime.now(), 
@@ -73,11 +75,13 @@ def most_relevant(request):
             .order_by('-num_votes'))
     temp_args['p_struct'] = children
     temp_args['prof_user'] = request.user
+    Session.remove()
     return render_to_response("most_relevant.html",
             temp_args,
             RequestContext(request))
 
 def most_discussed(request):
+    session = Session
     sel = select([sa_post.c.parent_id, func.count(sa_post.c.id).label("childs")], 
             whereclause=(sa_post.c.parent_id != None),
             from_obj=[sa_post])\
@@ -90,6 +94,7 @@ def most_discussed(request):
             .order_by('-num_votes'))
     temp_args['p_struct'] = children
     temp_args['prof_user'] = request.user
+    session.remove()
     return render_to_response("most_discussed.html",
             temp_args,
             RequestContext(request))
@@ -100,7 +105,7 @@ def make_post(request): #for commiting posts to the forum proper
         if pform.is_valid():
             post = pform.save(commit=False)
             post.user = request.user
-            post.username = request.username
+            post.aliasname = request.username
             post.save()
             return HttpResponseRedirect("/")
     return render_to_response("post_form.html",
@@ -175,9 +180,8 @@ def sub_post(request, id_num): #for nested posts
             post.save()
             messages.success(request, "Post submitted correctly")
         else:
-            # TODO
-            ### meaningful errors here would be helpful
-           ### messages.error(request, pform.errors)
+        ### meaningful errors here would be helpful
+        ### messages.error(request, pform.errors)
             return render_to_response("post_form.html",
                     {'pform' : pform, 'post':parent},
                     RequestContext(request))
@@ -230,6 +234,7 @@ def profile(request):
         formlist.append((rpfs[i], rel_o.votes[i]))
     temp_args['formlist'] = formlist
     temp_args['alias_form'] = AliasForm()
+
     return render_to_response('profile.html',
             temp_args,
             RequestContext(request))
